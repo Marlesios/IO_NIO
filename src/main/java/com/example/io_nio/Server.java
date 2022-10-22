@@ -17,21 +17,19 @@ public class Server {
 
         Socket clientSocket = serverSocket.accept();
         out.println("client connected " + clientSocket.getRemoteSocketAddress());
-        Scanner scan = new Scanner(System.in);
 
 
-        try(    PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
+        try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
 
             while (true) {
 
                 String msg;
-                String reply;
                 if ((msg = in.readLine()) != null) {
                     int number = Integer.parseInt(msg);
-                 //   System.out.printf("Port # %d \nMessage: %s \n", clientSocket.getPort(), msg);
-               //     System.out.println("Напишите ответ ");
-                 //   reply = scan.nextLine();
+                    //   System.out.printf("Port # %d \nMessage: %s \n", clientSocket.getPort(), msg);
+                    //     System.out.println("Напишите ответ ");
+                    //   reply = scan.nextLine();
                     out.println(fib(number));
                 }
                 if ("end".equals(msg)) {
@@ -42,11 +40,12 @@ public class Server {
         }
 
     }
-  public static int fib(int n){
-      if (n==0||n==1)
-          return n;
-      else if(n==2)
-          return 1;
-      return fib(n - 1) + fib(n - 2);
-  }
+
+    public static int fib(int n) {
+        if (n == 0 || n == 1)
+            return n;
+        else if (n == 2)
+            return 1;
+        return fib(n - 1) + fib(n - 2);
+    }
 }
