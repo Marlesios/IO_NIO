@@ -1,27 +1,39 @@
 package com.example.io_nio;
 
 import java.io.*;
-import java.net.Socket;
+import java.net.InetSocketAddress;
+
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class Client {
     public static void main(String[] args) throws IOException {
-        Socket socket = new Socket("127.0.0.1", 32001);
+        InetSocketAddress socketAddress = new InetSocketAddress("127.0.0.1",21445);
+        final SocketChannel socketChannel = SocketChannel.open();
+        socketChannel.connect(socketAddress);
 
-        try (BufferedReader in = new BufferedReader(
-                new InputStreamReader(socket.getInputStream()));
-             PrintWriter out = new PrintWriter(
-                     new OutputStreamWriter(socket.getOutputStream()), true);
-             Scanner scanner = new Scanner(System.in)) {
+        try(Scanner scan = new Scanner(System.in)){
+            final ByteBuffer inputBuffer = ByteBuffer.allocate(2 <<13);
             String msg;
-            String reply;
-            do {
-                System.out.println("Enter the number to count the equation ");
-                msg = scanner.nextLine();
-                out.println(msg);
-                reply = in.readLine();
-                System.out.println("Результат:  " + reply);
-            } while (!"end".equals(msg));
+                while(true){
+                    System.out.println("Введите данные для расчета...");
+                    msg = scan.nextLine();
+                    if("end".equals(msg)) break;
+
+                    socketChannel.write(ByteBuffer.wrap(
+                            msg.getBytes(StandardCharsets.UTF_8)));
+                    Thread.sleep(1000);
+
+                    int byteCount =socketChannel.read(inputBuffer);
+                    inputBuffer.clear();
+                    System.out.println(new String(inputBuffer.array(),0,byteCount,StandardCharsets.UTF_8));
+                }
+        }catch (InterruptedException ex){
+            ex.printStackTrace();
+        }finally {
+            socketChannel.close();
         }
     }
 }

@@ -2,9 +2,12 @@ package com.example.io_nio;
 
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Scanner;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
+
 
 import static java.lang.System.out;
 
@@ -12,37 +15,30 @@ public class Server {
     public static void main(String[] args) throws IOException {
 
 
-        ServerSocket serverSocket = new ServerSocket(32001);
+        final ServerSocketChannel serverChannel = ServerSocketChannel.open();
+        serverChannel.bind(new InetSocketAddress("localHost", 21445));
         out.println("server started");
 
-        Socket clientSocket = serverSocket.accept();
-        out.println("client connected " + clientSocket.getRemoteSocketAddress());
+        while (true) {
+            try (SocketChannel socketChannel = serverChannel.accept()) {
+                final ByteBuffer inputBuffer = ByteBuffer.allocate(2 << 13);
 
+                while (socketChannel.isConnected()) {
+                    int byteCount = socketChannel.read(inputBuffer);
+                    if (byteCount == -1) break;
 
-        try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
+                    final String msg = new String(inputBuffer.array(), 0, byteCount, StandardCharsets.UTF_8);
+                    inputBuffer.clear();
+                    out.println("полученные данные : " + msg);
 
-            while (true) {
-
-                String msg;
-                if ((msg = in.readLine()) != null) {
-                    int number = Integer.parseInt(msg);
-                    out.println(fib(number));
+                    socketChannel.write(ByteBuffer.wrap((msg.replaceAll("\\s+", "")).getBytes(StandardCharsets.UTF_8)));
                 }
-                if ("end".equals(msg)) {
-                    break;
-                }
-                serverSocket.close();
+            } catch (IOException ex) {
+                out.println(ex.getMessage());
             }
         }
 
     }
 
-    public static int fib(int n) {
-        if (n == 0 || n == 1)
-            return n;
-        else if (n == 2)
-            return 1;
-        return fib(n - 1) + fib(n - 2);
-    }
+
 }
