@@ -27,9 +27,6 @@ public class Server {
                 String msg;
                 if ((msg = in.readLine()) != null) {
                     int number = Integer.parseInt(msg);
-                    //   System.out.printf("Port # %d \nMessage: %s \n", clientSocket.getPort(), msg);
-                    //     System.out.println("Напишите ответ ");
-                    //   reply = scan.nextLine();
                     out.println(fib(number));
                 }
                 if ("end".equals(msg)) {
