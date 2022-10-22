@@ -14,7 +14,8 @@ import static java.lang.System.out;
 public class Server {
     public static void main(String[] args) throws IOException {
 
-
+//  Здесь я использовал Non_Blocking потому как можно вводить огромные пласты текста и программа может
+        // по кусочкам обрабатывать текст потому как это не критично в этой ситуации.
         final ServerSocketChannel serverChannel = ServerSocketChannel.open();
         serverChannel.bind(new InetSocketAddress("localHost", 21445));
         out.println("server started");
