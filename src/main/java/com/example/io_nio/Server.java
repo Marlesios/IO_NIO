@@ -11,7 +11,8 @@ import static java.lang.System.out;
 public class Server {
     public static void main(String[] args) throws IOException {
 
-
+        //Здесь использовал blocking потому как для вычислений очень важно что бы вся информация
+        //дошла и нужно будет её всё проработать а не кусочки
         ServerSocket serverSocket = new ServerSocket(32001);
         out.println("server started");
 
